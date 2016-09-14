@@ -1,0 +1,176 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct neighbor
+{
+		//Each node has a linked list of neighbors.
+		int ID; //The node ID of the neighbor.
+		int weight; //The weight of edge
+		struct neighbor *next;
+};
+
+struct node
+{
+		int ID;
+		struct neighbor *neighbors ; //Holds the pointer to the linked list containing the neighbors.
+		struct node *next; //Pointer to the next node and its data.
+};
+
+typedef struct node node;
+typedef struct neighbor neighbor; 
+
+node *graph = NULL;
+
+//Function to create and add new node
+int newnode(int ID);
+//Function to add a neighbor to the node
+int newneighbor(node *principalnode, int toID, int weight);
+//Function to print graph
+int printgraph(void);
+
+int newnode(int ID){
+		//Create and add a new node to the graph. Doesn't add the neighbors or weights yet.
+		node *temp =  NULL;
+		temp = (node *)malloc(sizeof(node));
+		temp->ID = ID;
+		temp->neighbors = NULL;
+		temp->next = NULL;
+		
+		node *current;
+		current = graph;
+
+		if( graph==NULL)
+				graph = temp;
+		else{
+				while(current->next != NULL)
+						current = current->next;
+				current->next = temp;
+		}
+		return 0;
+}
+
+node* searchnode(int ID){
+		node *currentnode;
+		currentnode=graph;
+		int flag=0;
+		while(currentnode!=NULL)
+		{
+				if(currentnode->ID == ID)
+				{
+						flag = 1;
+						break;
+				}
+				currentnode=currentnode->next;
+		}
+		if (flag==1){
+				return currentnode;
+		}
+		else
+				return NULL;
+}
+
+int newneighbor(node *principalnode, int toID, int weight){
+		neighbor *temp, *currentneighbor;
+		node *currentnode, *toinsert;
+		currentnode = graph;
+		
+		temp = (neighbor *)malloc(sizeof(neighbor));
+		temp->ID = toID;
+		temp->weight = weight;
+		temp->next = NULL;
+		
+		currentnode = principalnode;	
+		currentneighbor = currentnode->neighbors;
+		if(currentneighbor == NULL){
+				currentnode->neighbors = temp;
+		}
+		else{
+				while(currentneighbor->next!=NULL)
+				currentneighbor = currentneighbor->next;
+				currentneighbor->next = temp;
+		}
+		return 0;
+}
+
+int printgraph(void){
+		node *currentnode;
+		neighbor *currentneighbor;
+		currentnode = graph;
+
+		while(currentnode!=NULL){
+				currentneighbor = currentnode->neighbors;
+				printf("Node ID: %d ->", currentnode->ID);
+				while(currentneighbor != NULL){
+						printf("---%d---->%d|| ",currentneighbor->weight, currentneighbor->ID);
+						currentneighbor = currentneighbor->next;
+				}
+				printf("\n");
+				currentnode = currentnode->next;
+		}
+}
+
+
+
+int inputprompt(void){
+		int choice;
+		while(1)
+		{
+		printf(" -------------------------------------------------------------- \n \n ");
+		printf("                       Enter the choice: \n");
+		printf("\t\t 1) Insert node \n ");
+		printf("\t\t 2) Add neighbors to node \n ");
+		printf("\t\t 3) Print \n ");
+		printf("\t\t 4) Exit \n" );
+		printf(" \n ");
+		printf(" -------------------------------------------------------------- \n \n ");
+		scanf("%d", &choice);
+		int rollno;
+		int fromID;
+		int toID, weight;
+		int no=0;
+		int ID;
+		node *principalnode;
+		switch(choice){
+				case 1:
+						printf("Enter the node ID: \n");
+						scanf("%d",&ID);
+						newnode(ID);
+						break;
+				case 2:
+						printf("Enter the node to which neighbors are being added: \n");
+						scanf("%d",&fromID);
+						principalnode = searchnode(fromID);
+						if (principalnode==NULL)
+								printf("Node not found. Terminating. \n");
+						else
+						{
+						printf("Enter the number of neighbors: \n");
+						scanf("%d",&no);
+						printf("Enter the neighbors ID and weight in this format: ID weight\n");
+						for(int i=0;i<no;i++){
+								scanf("%d %d",&toID,&weight);
+							 	newneighbor(principalnode,toID,weight);
+								printf("Next:");
+								printf("\n");
+						}
+						}
+						break;
+						
+				case 3:
+						printgraph();
+						break;
+				case 4:
+						return;
+						
+				default:
+						printf("\n ------ Enter a valid choice ------ \n ");
+						break;
+					}
+		}
+		return;
+}
+
+	
+int main(void){
+		inputprompt();
+}
